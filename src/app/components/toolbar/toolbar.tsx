@@ -1,98 +1,48 @@
 import React from "react";
-import { tools } from "@/app/tools";
-import { ITool } from "@/app/interfaces";
-import { Stage } from "konva/lib/Stage";
-
-import { resetBoard, downloadPaint } from "./help_services";
-import { CustomToolButton, ColorPicker } from "./components";
-import eraserIcon from "public/assets/toolbar-svg/eraser-svgrepo-com.svg";
-import pencilIcon from "public/assets/toolbar-svg/pencil-svgrepo-com.svg";
-import clearIcon from "public/assets/toolbar-svg/undo-svgrepo-com.svg";
-import downloadIcon from "public/assets/toolbar-svg/download-svgrepo-com.svg";
-import markerIcon from "public/assets/toolbar-svg/marker-svgrepo-com.svg";
-import style from "./toolbar.module.scss";
-
 import { useRecoilState } from "recoil";
-import { drawingOptionsState } from "../../stores/drawing-options";
+import { ITool, ToolGroup } from "@/app/interfaces";
+import { toolList } from "@/app/tools";
+import { activeToolState } from "@/app/stores";
+import { IconButton } from "../ui";
+import { IconName } from "../icons";
 
-interface IToolbarProps {
-  stage?: Stage;
-  selectTool: (tool: ITool | null) => void;
-  active: ITool | null;
-}
+const groupOrder: ToolGroup[] = ["navigate", "draw", "shape", "content"];
 
-const Toolbar = (props: IToolbarProps) => {
-  const [drawingOptions, setDrawingOptions] =
-    useRecoilState(drawingOptionsState);
+const grouped = groupOrder.map((group) => ({
+  group,
+  items: toolList.filter((tool) => tool.group === group)
+}));
 
-  const updateCurrentStrokeWidth = (key: string, value: number) => {
-    setDrawingOptions({ ...drawingOptions, [key]: value });
-  };
+const Toolbar = () => {
+  const [activeTool, setActiveTool] = useRecoilState(activeToolState);
+
+  const renderTool = (tool: ITool) => (
+    <IconButton
+      key={tool.id}
+      icon={tool.id as IconName}
+      label={tool.label}
+      shortcut={tool.shortcut}
+      active={activeTool === tool.id}
+      tip="right"
+      onClick={() => setActiveTool(tool.id)}
+    />
+  );
 
   return (
-    <div className={style.toolbar}>
-      <div className={style.tools}>
-        <CustomToolButton
-          selectTool={() => {
-            props.selectTool(tools.pencil);
-            updateCurrentStrokeWidth("strokeWidth", 2);
-          }}
-          tool="Pencil"
-          active={props.active}
-          iconSource={pencilIcon}
-          activityIndicator={
-            props.active?.tool === tools.pencil.tool ? true : false
-          }
-        />
-
-        <CustomToolButton
-          selectTool={() => {
-            props.selectTool(tools.marker);
-            updateCurrentStrokeWidth("strokeWidth", 10);
-          }}
-          tool="Marker"
-          active={props.active}
-          iconSource={markerIcon}
-          activityIndicator={
-            props.active?.tool === tools.marker.tool ? true : false
-          }
-        />
-
-        <CustomToolButton
-          selectTool={() => props.selectTool(tools.eraser)}
-          tool="Eraser"
-          active={props.active}
-          iconSource={eraserIcon}
-          activityIndicator={
-            props.active?.tool === tools.eraser.tool ? true : false
-          }
-        />
-
-        <CustomToolButton
-          selectTool={() => {
-            props.selectTool(null);
-            props.stage && resetBoard(props.stage);
-          }}
-          tool="Clear"
-          active={props.active}
-          iconSource={clearIcon}
-        />
-
-        <CustomToolButton
-          selectTool={() => {
-            props.selectTool(null);
-            props.stage && downloadPaint(props.stage);
-          }}
-          tool="Download"
-          active={props.active}
-          iconSource={downloadIcon}
-        />
+    <div className="pointer-events-none fixed inset-x-0 bottom-3 z-30 flex justify-center px-3 md:inset-x-auto md:bottom-auto md:left-4 md:top-1/2 md:-translate-y-1/2">
+      <div className="pp-panel pointer-events-auto pp-scroll flex max-w-full items-center gap-1 overflow-x-auto p-1.5 md:flex-col md:overflow-visible">
+        {grouped.map(({ group, items }, index) => (
+          <React.Fragment key={group}>
+            {index > 0 ? (
+              <>
+                <span className="pp-divider hidden md:block" />
+                <span className="pp-divider-v md:hidden" />
+              </>
+            ) : null}
+            {items.map(renderTool)}
+          </React.Fragment>
+        ))}
       </div>
-      <ColorPicker
-        current_color={drawingOptions.color}
-        setDrawingOptions={setDrawingOptions}
-        drawingOptions={drawingOptions}
-      />
     </div>
   );
 };

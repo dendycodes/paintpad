@@ -1,12 +1,12 @@
 "use client";
-import BlackboardCore from "./core/blackboard-core";
+import React from "react";
 import { RecoilRoot } from "recoil";
+import BlackboardCore from "./core/blackboard-core";
+
 export default function App() {
   return (
-    <div>
-      <RecoilRoot>
-        <BlackboardCore />
-      </RecoilRoot>
-    </div>
+    <RecoilRoot>
+      <BlackboardCore />
+    </RecoilRoot>
   );
 }

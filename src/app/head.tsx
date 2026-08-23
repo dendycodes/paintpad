@@ -1,11 +1,15 @@
 export default function Head() {
   return (
     <>
-      <title>PaintPad</title>
-      <meta content="width=device-width, initial-scale=1" name="viewport" />
+      <title>PaintPad — an infinite drawing pad in your browser</title>
+      <meta
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        name="viewport"
+      />
+      <meta name="theme-color" content="#0b0c0f" />
       <meta
         name="description"
-        content="PaintPad is a simple painting application that allows users to create and save digital artwork. It provides a variety of painting tools and colors, and is easy to use for both beginners and experienced artists."
+        content="PaintPad is a fast, infinite drawing canvas: freehand brushes, shapes, text and images with undo, zoom, autosave and one-click export."
       />
       <link rel="icon" href="/favicon.ico" />
     </>
